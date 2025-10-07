@@ -1,6 +1,7 @@
 import { loginUser } from "../services/auth.service.js";
 import { createUser } from "../services/user.service.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../Handlers/responseHandlers.js";
+import { uservalidation } from "../validations/usuario.validation.js";
 
 export async function login(req, res) {
   try {
@@ -20,6 +21,19 @@ export async function login(req, res) {
 export async function register(req, res) {
   try {
     const data = req.body;
+    const { error } = uservalidation.validate({
+      email:data.email,
+      password:data.password,
+
+    }); 
+    if (error){
+      return handleErrorClient(
+        res,
+        400,
+        "parametros invalidos",
+        error.message,
+      );
+    }
     
     if (!data.email || !data.password) {
       return handleErrorClient(res, 400, "Email y contraseña son requeridos");
